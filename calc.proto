@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package calculator;
+package calculator_grpc;
 
-option go_package = "calculator/calculatorpb";
+option go_package = "./calculatorpb";
 
 message SumRequest {
   double num1 = 1;

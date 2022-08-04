@@ -1,16 +1,19 @@
-package server_grpc
+package main
 
 import (
 	"context"
 	"fmt"
+	"google.golang.org/grpc"
 	"io"
+	"josh/calculator_grpc/calculatorpb"
 	"log"
 	"math"
+	"net"
 	"time"
 )
 
 type server struct {
-	calc_pro.UnimplementedCalculatorServiceServer
+	calculatorpb.UnimplementedCalculatorServiceServer
 }
 
 func (*server) Sum(ctx context.Context, req *calculatorpb.SumRequest) (resp *calculatorpb.SumResponse, err error) {
@@ -114,4 +117,20 @@ func (*server) FindMaxNumber(stream calculatorpb.CalculatorService_FindMaxNumber
 		}
 	}
 	return nil
+}
+
+func main() {
+
+	listen, err := net.Listen("tcp", "0.0.0.0:8080")
+	if err != nil {
+		log.Fatalf("Failed to Listen: %v", err)
+	}
+
+	s := grpc.NewServer()
+	calculatorpb.RegisterCalculatorServiceServer(s, &server{})
+
+	log.Println("Initiating Server")
+	if err = s.Serve(listen); err != nil {
+		log.Fatalf("failed to serve : %v", err)
+	}
 }
